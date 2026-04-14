@@ -3,6 +3,7 @@ package net.cytonic.cytosis.events;
 import com.google.errorprone.annotations.Keep;
 import io.opentelemetry.api.common.Attributes;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.bossbar.BossBar.Color;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.entity.GameMode;
@@ -101,6 +102,12 @@ public final class ServerEventListeners {
         Runtime rt = Runtime.getRuntime();
         long used = rt.totalMemory() - rt.freeMemory();
         MEM_USED = used / 1_000_000;
+        if (RAW_MSPT > 50) {
+            TpsCommand.BAR.color(Color.RED);
+        } else {
+            TpsCommand.BAR.color(Color.BLUE);
+        }
+        TpsCommand.BAR.progress((float) Math.clamp((RAW_MSPT / 50F), 0, 1));
         TpsCommand.BAR.name(
             Component.text("MSPT: " + Utils.FOUR_PLACES.format(RAW_MSPT) + "ms |  MEM: " + MEM_USED + "mb",
                 NamedTextColor.GOLD));
