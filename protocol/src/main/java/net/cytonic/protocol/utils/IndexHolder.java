@@ -42,13 +42,11 @@ public class IndexHolder {
             File selfJar = new File(IndexHolder.class.getProtectionDomain()
                 .getCodeSource().getLocation().getPath());
             if (selfJar.getName().endsWith(".jar")) {
-                indices.add(indexJar(selfJar, "net.minestom.server.event"));
                 indices.add(indexJar(selfJar, "io.github.togar2.pvp.events"));
             }
 
         } else {
             // Thin jar - Minestom was downloaded at runtime, find the jar
-            indices.add(indexJar(findJarForClass("net.minestom.server.event.Event"), "net.minestom.server.event"));
             indices.add(indexJar(findJarForClass("io.github.togar2.pvp.MinestomPvP"), "io.github.togar2.pvp.events"));
         }
 
@@ -72,6 +70,7 @@ public class IndexHolder {
         try (JarFile jar = new JarFile(jarFile)) {
             ZipEntry entry = jar.getEntry("META-INF/jandex.idx");
             if (entry != null) {
+                log.info("Found prebuilt index for jar \"{}\".", jarFile.getName());
                 try (InputStream is = jar.getInputStream(entry)) {
                     return new IndexReader(is).read();
                 }
