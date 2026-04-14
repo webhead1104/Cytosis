@@ -147,10 +147,6 @@ public class PlayerListManager implements Bootstrappable {
         return packets;
     }
 
-    private void createComponentsForPlayer(CytosisPlayer player) {
-
-    }
-
     /**
      * Update a player's player list
      *
