@@ -1,6 +1,9 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.ebean.annotation.Platform.POSTGRES
 import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
+import org.jboss.jandex.IndexWriter
+import org.jboss.jandex.Indexer
+import java.util.jar.JarFile
 
 plugins {
     `maven-publish`
@@ -77,6 +80,13 @@ dependencies {
     compileOnly(libs.lombokwarningfix)
 }
 
+buildscript {
+    repositories { mavenCentral() }
+    dependencies {
+        classpath("io.smallrye:jandex:3.5.3")
+    }
+}
+
 // alwaysShade: Always shadowed in both thin and fat jars
 fun DependencyHandler.alwaysShade(dependencyNotation: Any) {
     val resolved = when (dependencyNotation) {
@@ -146,8 +156,54 @@ migration {
     databases = listOf("global", "environment")
 }
 
+val buildIndex = tasks.register("indexMinestomEvents") {
+    group = "build"
+    description = "Indexes net.minestom.server.event from the Minestom dependency jar."
+
+    // Depend on configuration resolution so the jar is present
+    dependsOn(configurations["downloadOrShadow"])
+
+    val outputFile = layout.buildDirectory.file("resources/main/META-INF/jandex.idx")
+    outputs.file(outputFile)
+
+    doLast {
+        val indexer = Indexer()
+
+        val minestomJar = configurations["downloadOrShadow"]
+            .resolvedConfiguration
+            .resolvedArtifacts
+            .first { it.name == "minestom" }
+            .file
+
+        val classesDir = layout.buildDirectory.dir("classes/java/main").get().asFile
+        classesDir.walkTopDown()
+            .filter { it.isFile && it.extension == "class" }
+            .forEach { file ->
+                file.inputStream().use(indexer::index)
+            }
+
+        JarFile(minestomJar).use { jar ->
+            jar.entries().asSequence()
+                .filter { entry ->
+                    entry.name.startsWith("net/minestom/server/event/")
+                            && entry.name.endsWith(".class")
+                }
+                .forEach { entry ->
+                    jar.getInputStream(entry).use(indexer::index)
+                }
+        }
+        val idx = indexer.complete()
+
+
+        val out = outputFile.get().asFile
+        out.parentFile.mkdirs()
+        out.outputStream().use { IndexWriter(it).write(idx) }
+    }
+}
+
 tasks.withType<Javadoc> {
     dependsOn("jandex")
+    dependsOn(buildIndex)
     dependsOn("generateRuntimeDownloadResourceForRuntimeDownload")
     dependsOn("generateRuntimeDownloadResourceForRuntimeDownloadOnly")
 
@@ -195,13 +251,14 @@ val thinShadow = tasks.register<ShadowJar>("thinShadow") {
     dependsOn("generateRuntimeDownloadResourceForRuntimeDownloadOnly")
     dependsOn("generateRuntimeDownloadResourceForRuntimeDownload")
     dependsOn("jandex")
+    dependsOn(buildIndex)
 
     exclude("META-INF/*.SF")
     exclude("META-INF/*.DSA")
     exclude("META-INF/*.RSA")
 
     mergeServiceFiles()
-//    exclude("META-INF/jandex.idx")
+
     archiveClassifier.set("")
     destinationDirectory.set(layout.buildDirectory.dir("temp"))
     from(sourceSets.main.get().output)
@@ -238,6 +295,8 @@ val fatShadow = tasks.register<ShadowJar>("fatShadow") {
     dependsOn("generateRuntimeDownloadResourceForRuntimeDownloadOnly")
     dependsOn("generateRuntimeDownloadResourceForRuntimeDownload")
     dependsOn("jandex")
+    dependsOn(buildIndex)
+
 
     mergeServiceFiles()
 //    exclude("META-INF/jandex.idx")
@@ -386,6 +445,8 @@ checkstyle {
 
 tasks.withType<Checkstyle>().configureEach {
     dependsOn("jandex")
+    dependsOn(buildIndex)
+
     reports {
         xml.required.set(true)
         html.required.set(true)
@@ -394,6 +455,10 @@ tasks.withType<Checkstyle>().configureEach {
 
     // Always generate reports, even on failure
     isIgnoreFailures = true
+}
+
+tasks.named("jandex") {
+    finalizedBy(buildIndex)
 }
 
 // Configure checkstyle tasks
