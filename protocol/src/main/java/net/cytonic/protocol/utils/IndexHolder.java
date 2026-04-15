@@ -37,18 +37,18 @@ public class IndexHolder {
             if (is != null) indices.add(new IndexReader(is).read());
         }
 
-        if (Boolean.parseBoolean(System.getProperty("cytosis.dependencies_bundled"))) {
-            // Fat jar - Minestom is shadowed into our own jar, scan it with a filter
-            File selfJar = new File(IndexHolder.class.getProtectionDomain()
-                .getCodeSource().getLocation().getPath());
-            if (selfJar.getName().endsWith(".jar")) {
-                indices.add(indexJar(selfJar, "io.github.togar2.pvp.events"));
-            }
-
-        } else {
-            // Thin jar - Minestom was downloaded at runtime, find the jar
-            indices.add(indexJar(findJarForClass("io.github.togar2.pvp.MinestomPvP"), "io.github.togar2.pvp.events"));
-        }
+//        if (Boolean.parseBoolean(System.getProperty("cytosis.dependencies_bundled"))) {
+//            // Fat jar - Minestom is shadowed into our own jar, scan it with a filter
+//            File selfJar = new File(IndexHolder.class.getProtectionDomain()
+//                .getCodeSource().getLocation().getPath());
+//            if (selfJar.getName().endsWith(".jar")) {
+//                indices.add(indexJar(selfJar, "io.github.togar2.pvp.events"));
+//            }
+//
+//        } else {
+//            // Thin jar - Minestom was downloaded at runtime, find the jar
+//            indices.add(indexJar(findJarForClass("io.github.togar2.pvp.MinestomPvP"), "io.github.togar2.pvp.events"));
+//        }
 
         // Add each plugin's index
         for (File jar : pluginJars) {
