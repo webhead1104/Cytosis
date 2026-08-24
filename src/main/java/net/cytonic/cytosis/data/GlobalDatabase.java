@@ -169,12 +169,16 @@ public class GlobalDatabase implements Bootstrappable {
             "CREATE INDEX IF NOT EXISTS idx_players_name ON cytonic_players(name)",
         };
 
-        for (String sql : indexes) {
-            try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-                ps.execute();
-            } catch (Exception e) {
-                Logger.error("Failed to create index", e);
+        try (Connection conn = getConnection()) {
+            for (String sql : indexes) {
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.execute();
+                } catch (Exception e) {
+                    Logger.error("Failed to create index", e);
+                }
             }
+        } catch (SQLException e) {
+            Logger.error("Failed to create optimized indexes", e);
         }
     }
 
