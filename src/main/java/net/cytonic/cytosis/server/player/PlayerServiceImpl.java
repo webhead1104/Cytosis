@@ -25,10 +25,19 @@ public class PlayerServiceImpl implements PlayerService {
     @Blocking
     @Override
     public void updatePlayerData(PlayerData playerData) {
-        PlayerDataEntity playerDataEntity = new PlayerDataEntity();
-        playerDataEntity.uuid(playerData.uuid());
-        playerDataEntity.username(playerData.username());
         PlayerSkin skin = playerData.playerSkin();
+
+        // PlayerDataEntity uses a manually-assigned @Id, so Ebean treats every freshly
+        // created instance as new and INSERTs it. Fetch the existing row first and only
+        // construct a new entity when absent, so repeated calls for the same UUID update.
+        PlayerDataEntity playerDataEntity = DB.find(PlayerDataEntity.class, playerData.uuid());
+        if (playerDataEntity == null) {
+            playerDataEntity = new PlayerDataEntity();
+            playerDataEntity.uuid(playerData.uuid());
+        }
+        playerDataEntity.username(playerData.username());
+        playerDataEntity.ip(playerData.ip());
+        playerDataEntity.proxy(playerData.proxy());
         if (skin != null) {
             playerDataEntity.skinSignature(skin.signature());
             playerDataEntity.skinTextures(skin.textures());
