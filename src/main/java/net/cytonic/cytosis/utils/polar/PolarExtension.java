@@ -78,7 +78,7 @@ public class PolarExtension implements PolarWorldAccess {
                 Holder<PaintingVariant> var = MinecraftServer.getPaintingVariantRegistry().get(Key.key(variant));
                 if (var == null) {
                     Logger.error("Unknown painting variant: " + variant + " - skipping entity");
-                    return;
+                    continue;
                 }
                 Entity entity = new Entity(EntityType.PAINTING);
                 PaintingMeta meta = (PaintingMeta) entity.getEntityMeta();
