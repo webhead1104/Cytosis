@@ -22,7 +22,9 @@ public class LoopCommand extends CytosisCommand {
         super("loop");
 
         ArgumentInteger iterationsArg = ArgumentType.Integer("iterations");
+        iterationsArg.between(1, 1000);
         ArgumentInteger periodArg = ArgumentType.Integer("period");
+        periodArg.between(0, 72000);
         Argument<String[]> commandArg = ArgumentType.StringArray("command").setDefaultValue(new String[0]);
 
         setCondition(CommandUtils.IS_STAFF);
@@ -47,6 +49,7 @@ public class LoopCommand extends CytosisCommand {
 
             if (command.length == 0) {
                 player.whoops("You need to specify a command to loop!");
+                return;
             }
 
             String commandStr = String.join(" ", command);
