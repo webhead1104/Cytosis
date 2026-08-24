@@ -33,7 +33,7 @@ public record Report<T extends ReportType<T>>(UUID uuid, ReportContext<T> contex
     public CompletableFuture<Void> markResolved() {
         return CompletableFuture.supplyAsync(() -> {
             DB.update(ReportEntity.class)
-                .set("resolved", reporter())
+                .set("resolved", true)
                 .where().idEq(uuid)
                 .update();
             return null;
