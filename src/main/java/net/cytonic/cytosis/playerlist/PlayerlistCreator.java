@@ -69,9 +69,10 @@ public interface PlayerlistCreator<P extends CytosisPlayer> {
 
         Column playerCol = new Column(Msg.mm("<dark_purple><b>        Players    "), PlayerListFavicon.PURPLE);
         if (players.size() >= 19) {
-            int extra = players.size() - 19;
+            int extra = players.size() - 18;
             players = new ArrayList<>(players.subList(0, 18));
             players.add(new PlayerListEntry(Msg.mm("<italic> + " + extra + " more"), 100));
+            playerCol.setEntries(players);
         } else {
             playerCol.setEntries(new ArrayList<>(players));
             players.clear();
