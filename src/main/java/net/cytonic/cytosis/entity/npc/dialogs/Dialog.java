@@ -29,6 +29,7 @@ public class Dialog<P extends CytosisPlayer> {
     private final List<DialogElement<P>> elements = new ArrayList<>();
     private final List<ClickCallback<?>> clickCallbacks = new ArrayList<>();
     private final Set<Integer> usedOptionGroups = new HashSet<>();
+    private int nextOptionGroupId = 0;
     private boolean finished = false;
 
     public Dialog(NPC npc) {
@@ -121,18 +122,25 @@ public class Dialog<P extends CytosisPlayer> {
         element.run(player, this, index);
     }
 
-    public void markOptionGroupUsed(int startIndex) {
-        usedOptionGroups.add(startIndex);
+    /**
+     * Returns a unique key per presented option group; keys are never reused within a dialog
+     * instance, so used-group guards survive {@link #clearElements()}.
+     */
+    public int nextOptionGroupId() {
+        return nextOptionGroupId++;
+    }
+
+    public void markOptionGroupUsed(int groupKey) {
+        usedOptionGroups.add(groupKey);
     }
 
     public void clearElements() {
         elements.clear();
-        usedOptionGroups.clear();
         finished = false;
     }
 
-    public boolean isOptionGroupUsed(int startIndex) {
-        return usedOptionGroups.contains(startIndex);
+    public boolean isOptionGroupUsed(int groupKey) {
+        return usedOptionGroups.contains(groupKey);
     }
 
     public void end(P player) {
