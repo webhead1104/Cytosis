@@ -413,6 +413,7 @@ public class CytosisPlayer extends CombatPlayerImpl implements NetworkPlayer, Pr
     public void sendPacketToViewersAndSelf(@NotNull SendablePacket packet) {
         if (!(packet instanceof EntityMetaDataPacket p)) {
             super.sendPacketToViewersAndSelf(packet);
+            return;
         }
 
         if (!isVanished()) {
