@@ -65,7 +65,7 @@ public class MuteCommand extends CytosisCommand {
 
     private void mutePlayer(CytosisPlayer actor, String target, Instant duration) {
         CytonicNetwork network = Cytosis.get(CytonicNetwork.class);
-        if (!network.getLifetimePlayers().containsValue(target)) {
+        if (!network.getLifetimeFlattened().containsValue(target.toLowerCase())) {
             actor.whoops("The player %s doesn't exist!", target);
             return;
         }
