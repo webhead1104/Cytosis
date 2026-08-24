@@ -9,8 +9,8 @@ import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A class that holds a bidirectional map, meaning it can be queried by key AND value. Under the hood, it uses a
- * ConcurrentHashMap, making it thread safe.
+ * A class that holds a bidirectional map, meaning it can be queried by key AND value. Under the hood, it uses two
+ * ConcurrentHashMaps; reads are lock-free, while paired writes to both maps are made atomic by a single internal lock.
  *
  * @param <K> The key type
  * @param <V> The value type
@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class BiMap<K, V> implements Iterable<Map.Entry<K, V>> {
 
+    private final Object mutationLock = new Object();
     private final ConcurrentHashMap<K, V> keyToValue = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<V, K> valueToKey = new ConcurrentHashMap<>();
 
@@ -35,8 +36,10 @@ public class BiMap<K, V> implements Iterable<Map.Entry<K, V>> {
      * @param value The value
      */
     public void put(K key, V value) {
-        keyToValue.put(key, value);
-        valueToKey.put(value, key);
+        synchronized (mutationLock) {
+            keyToValue.put(key, value);
+            valueToKey.put(value, key);
+        }
     }
 
     /**
@@ -46,21 +49,27 @@ public class BiMap<K, V> implements Iterable<Map.Entry<K, V>> {
      * @param value The value
      */
     public void remove(K key, V value) {
-        keyToValue.remove(key);
-        valueToKey.remove(value);
+        synchronized (mutationLock) {
+            keyToValue.remove(key);
+            valueToKey.remove(value);
+        }
     }
 
     public void removeByKey(K key) {
-        V key2 = keyToValue.remove(key);
-        if (key2 != null) {
-            valueToKey.remove(key2);
+        synchronized (mutationLock) {
+            V key2 = keyToValue.remove(key);
+            if (key2 != null) {
+                valueToKey.remove(key2);
+            }
         }
     }
 
     public void removeByValue(V key) {
-        K key2 = valueToKey.remove(key);
-        if (key2 != null) {
-            keyToValue.remove(key2);
+        synchronized (mutationLock) {
+            K key2 = valueToKey.remove(key);
+            if (key2 != null) {
+                keyToValue.remove(key2);
+            }
         }
     }
 
@@ -68,8 +77,10 @@ public class BiMap<K, V> implements Iterable<Map.Entry<K, V>> {
      * Removes all keys and values from the map
      */
     public void clear() {
-        keyToValue.clear();
-        valueToKey.clear();
+        synchronized (mutationLock) {
+            keyToValue.clear();
+            valueToKey.clear();
+        }
     }
 
     /**
