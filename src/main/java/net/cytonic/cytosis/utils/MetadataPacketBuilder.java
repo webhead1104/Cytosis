@@ -86,7 +86,7 @@ public class MetadataPacketBuilder {
             return false;
         }
 
-        return (entry.value() & (1 << bit)) != 0;
+        return (entry.value() & bit) != 0;
     }
 
     public boolean isSneaking() {
