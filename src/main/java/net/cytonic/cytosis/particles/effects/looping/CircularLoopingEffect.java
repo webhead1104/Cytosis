@@ -100,7 +100,9 @@ public class CircularLoopingEffect extends LoopingEffect {
 
     private void cachePositions() {
         for (int i = 0; i < resolution; i++) {
-            cachedPositions[i] = calculatePos(i * increment);
+            double angle = i * increment;
+            this.radius = radiusFunc.apply(angle);
+            cachedPositions[i] = calculatePos(angle);
         }
     }
 
