@@ -164,10 +164,12 @@ public class CytonicNetwork implements Bootstrappable {
                 }
             }
 
-            if (p.muteExpiry() != null && p.muteExpiry().isBefore(Instant.now())) {
-                this.gdb.unmutePlayer(p.uuid());
-            } else {
-                mutedPlayers.put(p.uuid(), true);
+            if (p.muteExpiry() != null) {
+                if (p.muteExpiry().isBefore(Instant.now())) {
+                    this.gdb.unmutePlayer(p.uuid());
+                } else {
+                    mutedPlayers.put(p.uuid(), true);
+                }
             }
         }
     }
