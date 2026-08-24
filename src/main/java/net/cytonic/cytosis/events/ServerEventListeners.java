@@ -316,5 +316,6 @@ public final class ServerEventListeners {
         ExpiringMap.expire(player.getUuid());
         Cytosis.get(NpcManager.class).removePlayer(player);
         PlayerHolograms.removePlayer(player);
+        Cytosis.get(RankManager.class).removePlayer(player);
     }
 }
