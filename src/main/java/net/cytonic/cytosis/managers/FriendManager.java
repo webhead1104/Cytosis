@@ -81,10 +81,23 @@ public class FriendManager implements Bootstrappable {
     }
 
     private void addFriendRecursive(UUID uuid, UUID friend, boolean recursive) {
-        Set<UUID> list = friends.computeIfAbsent(uuid, _ -> ConcurrentHashMap.newKeySet());
-        list.add(friend);
-
-        db.updateFriends(uuid, list);
+        Set<UUID> cached = friends.get(uuid);
+        if (cached != null) {
+            cached.add(friend);
+            db.updateFriends(uuid, cached);
+        } else {
+            // Not cached here (offline elsewhere, or load still in flight):
+            // persisting a freshly-created set would wipe the real list, so
+            // read-modify-write the authoritative DB list instead.
+            db.loadFriends(uuid).thenAccept(loaded -> {
+                Set<UUID> updated = new HashSet<>(loaded); // copy: loaded may be immutable
+                updated.add(friend);
+                db.updateFriends(uuid, updated);
+            }).exceptionally(throwable -> {
+                Logger.error("Failed to add friend " + friend + " for uncached player " + uuid, throwable);
+                return null;
+            });
+        }
 
         if (recursive) { // add the other player to their friends' list
             addFriendRecursive(friend, uuid, false);
@@ -104,10 +117,23 @@ public class FriendManager implements Bootstrappable {
     }
 
     private void removeFriendRecursive(UUID uuid, UUID friend, boolean recursive) {
-        Set<UUID> list = friends.computeIfAbsent(uuid, _ -> ConcurrentHashMap.newKeySet());
-        list.remove(friend);
-
-        db.updateFriends(uuid, list);
+        Set<UUID> cached = friends.get(uuid);
+        if (cached != null) {
+            cached.remove(friend);
+            db.updateFriends(uuid, cached);
+        } else {
+            // Not cached here (offline elsewhere, or load still in flight):
+            // persisting a freshly-created set would wipe the real list, so
+            // read-modify-write the authoritative DB list instead.
+            db.loadFriends(uuid).thenAccept(loaded -> {
+                Set<UUID> updated = new HashSet<>(loaded); // copy: loaded may be immutable
+                updated.remove(friend);
+                db.updateFriends(uuid, updated);
+            }).exceptionally(throwable -> {
+                Logger.error("Failed to remove friend " + friend + " for uncached player " + uuid, throwable);
+                return null;
+            });
+        }
 
         if (recursive) {
             removeFriendRecursive(friend, uuid, false);
