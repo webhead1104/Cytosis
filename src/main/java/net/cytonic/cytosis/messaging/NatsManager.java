@@ -58,8 +58,10 @@ public class NatsManager implements Bootstrappable {
     @SneakyThrows // don't care about the error on shutdown
     @Override
     public void shutdown() {
+        Connection conn = connection;
+        if (conn == null) return; // never connected (or disconnected), nothing to close
         sendServerStatusPacket(false);
-        connection.close();
+        conn.close();
     }
 
     private void sendServerStatusPacket(boolean isStartup) {
