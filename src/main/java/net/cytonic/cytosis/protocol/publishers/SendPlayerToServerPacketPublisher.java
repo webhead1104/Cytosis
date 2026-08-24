@@ -33,6 +33,7 @@ public class SendPlayerToServerPacketPublisher {
             CytosisPlayer player = Cytosis.getPlayer(uuid).get();
             if (throwable != null) {
                 player.error("An error occurred whilst sending you to %s!", server.id());
+                return;
             }
 
             if (!response.success()) {
@@ -55,6 +56,7 @@ public class SendPlayerToServerPacketPublisher {
                     displayName == null ? "a server" : displayName);
                 Logger.error("An error occurred whilst sending " + player + " to a generic " + type.asString()
                     + "! <red>(%s)</red>", throwable);
+                return;
             }
 
             if (!response.success()) {
