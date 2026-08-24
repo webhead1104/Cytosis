@@ -432,8 +432,9 @@ public class GlobalDatabase implements Bootstrappable {
                     .addToGlobalHash("player_ranks", uuid.toString(), rank.name());
 
                 future.complete(null);
-            } catch (SQLException e) {
-                Logger.error("An error occurred whilst setting the rank of '" + uuid + "'");
+            } catch (Exception e) {
+                Logger.error("An error occurred whilst setting the rank of '" + uuid + "'", e);
+                future.completeExceptionally(e);
             }
         });
         return future;
