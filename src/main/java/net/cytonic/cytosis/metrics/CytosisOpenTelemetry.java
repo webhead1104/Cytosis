@@ -94,6 +94,7 @@ public class CytosisOpenTelemetry implements Bootstrappable {
 
     @Override
     public void shutdown() {
+        if (sdk == null) return;
         sdk.shutdown();
     }
 
