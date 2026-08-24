@@ -116,7 +116,7 @@ public class NicknameGenerator {
     }
 
     public static PlayerRank generateRank() {
-        return PlayerRank.values()[RANDOM.nextInt(PlayerRank.values().length - 5) + 5]; // No staff ranks or elysian
+        return PlayerRank.values()[RANDOM.nextInt(PlayerRank.values().length - 4) + 4]; // No staff ranks
     }
 
     /**
