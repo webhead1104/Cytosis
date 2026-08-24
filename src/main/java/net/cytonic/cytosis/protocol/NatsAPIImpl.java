@@ -39,6 +39,11 @@ public class NatsAPIImpl implements NatsAPI {
     public void request(String channel, String data, BiConsumer<byte[], Throwable> consumer) {
         log("Requesting on channel %s %s", channel, data);
         Cytosis.get(NatsManager.class).request(channel, data.getBytes(), ((message, throwable) -> {
+            if (message == null) {
+                log("Received Nats request failure from request %s %s", channel, throwable);
+                consumer.accept(null, throwable);
+                return;
+            }
             log("Received Nats request from request %s %s", channel, new String(message.getData()));
             consumer.accept(message.getData(), throwable);
         }));
