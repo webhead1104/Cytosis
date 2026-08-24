@@ -16,7 +16,7 @@ public class Snoops {
     private static final byte ALL_STAFF = (byte) (0x01 | 0x02 | 0x04 | 0x08); // owner, admin, mod, helper
     private static final byte NOT_HELPER = (byte) (0x01 | 0x02 | 0x04); // owner, admin, mod
     private static final byte ADMIN = (byte) (0x01 | 0x02); // owner, admin
-    private static final byte MODERATOR = (byte) (0x01 | 0x04); // owner, moderator
+    private static final byte MODERATOR = (byte) (0x01 | 0x02 | 0x04); // owner, admin, moderator
 
     private static final List<SnooperChannel> REGISTRY = new ArrayList<>();
 
