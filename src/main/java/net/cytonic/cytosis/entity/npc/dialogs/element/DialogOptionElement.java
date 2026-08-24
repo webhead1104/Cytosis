@@ -41,6 +41,7 @@ public record DialogOptionElement<P extends CytosisPlayer>(
             return;
         }
 
+        int groupId = dialog.nextOptionGroupId();
         player.sendMessage(Component.empty());
         for (DialogOptionElement<P> option : options) {
             Component clickable =
@@ -48,11 +49,11 @@ public record DialogOptionElement<P extends CytosisPlayer>(
                     .append(option.text().color(NamedTextColor.YELLOW))
                     .append(Msg.mm("]"))
                     .clickEvent(ClickEvent.callback(_ -> {
-                            if (dialog.isOptionGroupUsed(index)) {
+                            if (dialog.isOptionGroupUsed(groupId)) {
                                 return;
                             }
 
-                            dialog.markOptionGroupUsed(index);
+                            dialog.markOptionGroupUsed(groupId);
                             dialog.clearElements();
                             option.callback().accept(player, dialog);
                         },
