@@ -1,5 +1,6 @@
 package net.cytonic.cytosis.utils;
 
+import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -114,7 +115,26 @@ public final class Utils {
         // Handle Cloneable types
         if (value instanceof Cloneable) {
             try {
-                return (T) value.getClass().getMethod("clone").invoke(value);
+                Class<?> clazz = value.getClass();
+                if (clazz.isArray()) { // array classes expose a public clone()
+                    return (T) clazz.getMethod("clone").invoke(value);
+                }
+
+                // Object#clone() is protected and most Cloneable implementations do not widen it,
+                // so locate the declaration in the class hierarchy and suppress access checks.
+                Method cloneMethod = null;
+                for (Class<?> c = clazz; c != null && cloneMethod == null; c = c.getSuperclass()) {
+                    try {
+                        cloneMethod = c.getDeclaredMethod("clone");
+                    } catch (NoSuchMethodException ignored) {
+                        // no declaration here; continue up
+                    }
+                }
+                if (cloneMethod == null) {
+                    throw new IllegalStateException("No clone() declaration found on " + clazz.getName());
+                }
+                cloneMethod.setAccessible(true);
+                return (T) cloneMethod.invoke(value);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to clone " + value.getClass().getName() + " using clone()", e);
             }
