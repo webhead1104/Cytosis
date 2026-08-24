@@ -130,11 +130,11 @@ public class MetadataPacketBuilder {
     }
 
     public boolean isFlyingWithElytra() {
-        return getBitmask((byte) 0x01);
+        return getBitmask((byte) 0x80);
     }
 
     public MetadataPacketBuilder setFlyingWithElytra(boolean enable) {
-        return setBitmask(enable, (byte) 0x01);
+        return setBitmask(enable, (byte) 0x80);
     }
 
     public MetadataPacketBuilder setVarInt(int index, int value) {
