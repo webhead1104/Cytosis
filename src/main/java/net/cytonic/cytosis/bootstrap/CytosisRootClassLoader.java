@@ -1,5 +1,6 @@
 package net.cytonic.cytosis.bootstrap;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -32,7 +33,7 @@ public class CytosisRootClassLoader extends URLClassLoader {
 
     private static URL[] extractUrlsFromClasspath() {
         String classpath = System.getProperty("java.class.path");
-        String[] parts = classpath.split(";");
+        String[] parts = classpath.split(File.pathSeparator);
         URL[] urls = new URL[parts.length];
         for (int i = 0; i < urls.length; i++) {
             try {
