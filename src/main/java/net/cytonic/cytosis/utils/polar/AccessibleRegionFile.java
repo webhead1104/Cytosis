@@ -182,16 +182,16 @@ final class AccessibleRegionFile implements AutoCloseable {
     }
 
     private int findFreeSectors(int length) {
-        for (int start = 0; start < freeSectors.size() - length; start++) {
+        for (int start = 0; start <= freeSectors.size() - length; start++) {
             boolean found = true;
             for (int i = 0; i < length; i++) {
-                if (!freeSectors.getBoolean(start++)) {
+                if (!freeSectors.getBoolean(start + i)) {
                     found = false;
                     break;
                 }
             }
             if (found) {
-                return start - length;
+                return start;
             }
         }
         return -1;
