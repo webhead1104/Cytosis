@@ -250,6 +250,9 @@ public class NetworkCooldownManager implements Bootstrappable {
      */
     @Nullable
     public Instant getPersonalExpiry(UUID uuid, Key node) {
+        if (!personal.containsKey(uuid)) {
+            return null;
+        }
         return personal.get(uuid).get(node);
     }
 
