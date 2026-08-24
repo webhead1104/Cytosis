@@ -11,6 +11,7 @@ import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.ArgumentWord;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.cytonic.cytosis.Cytosis;
 import net.cytonic.cytosis.commands.utils.CommandUtils;
@@ -127,18 +128,23 @@ public class BanCommand extends CytosisCommand {
         BanData banData = new BanData(reason, dur, true);
         new PlayerKickNotifyPacket.Packet(uuid, KickReason.BANNED, Msg.formatBanMessage(banData)).publish();
 
-        String durationText = DurationParser.unparseFull(dur);
-        actor.sendMessage(Msg.mm("<green>%s was successfully banned for %s.", player, durationText));
+        actor.sendMessage(Msg.mm("<green>%s was successfully banned %s.", player, durationPhrase(dur)));
 
         sendBanSnoop(actor, uuid, reason, dur);
     }
 
     private void sendBanSnoop(CytosisPlayer actor, UUID uuid, String reason, Instant dur) {
-        String durationText = DurationParser.unparseFull(dur);
         Component snoop = actor.formattedName().append(Msg.grey(" banned ")).append(SnoopUtils.toTarget(uuid))
-            .append(Msg.grey(" for %s with the reason %s", durationText, reason));
+            .append(Msg.grey(" %s with the reason %s", durationPhrase(dur), reason));
 
         Cytosis.get(SnooperManager.class).sendSnoop(Snoops.PLAYER_BAN, Msg.snoop(snoop));
+    }
+
+    /**
+     * A null duration represents a permanent ban per {@link DurationParser#parseInstant(String)}.
+     */
+    private static String durationPhrase(@Nullable Instant dur) {
+        return dur == null ? "permanently" : "for " + DurationParser.unparseFull(dur);
     }
 
     private Void handleBanCheckError(CommandSender sender, String player, Throwable throwable) {
