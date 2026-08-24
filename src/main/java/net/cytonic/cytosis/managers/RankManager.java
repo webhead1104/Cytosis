@@ -136,11 +136,30 @@ public class RankManager implements Bootstrappable {
      * @param rank   The rank
      */
     public void setupCosmetics(CytosisPlayer player, PlayerRank rank) {
+        removeFromRankTeams(player.getUsername());
         teamMap.get(rank).addMember(player.getUsername());
         player.set(DataComponents.CUSTOM_NAME, rank.getPrefix().append(player.getName()));
         Cytosis.get(CommandHandler.class).recalculateCommands(player);
         if (player.isVanished()) {
             player.setVanished(true); // ranks can mess up the visuals sometimes
+        }
+    }
+
+    /**
+     * Removes a player from any rank {@link Team} they are a member of. Called when a player disconnects so team
+     * membership sets don't grow unboundedly.
+     *
+     * @param player the player who disconnected
+     */
+    public void removePlayer(CytosisPlayer player) {
+        removeFromRankTeams(player.getUsername());
+    }
+
+    private void removeFromRankTeams(String username) {
+        for (Team team : teamMap.values()) {
+            if (team.getMembers().contains(username)) {
+                team.removeMember(username);
+            }
         }
     }
 
