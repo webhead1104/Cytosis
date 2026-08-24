@@ -396,8 +396,9 @@ public class GlobalDatabase implements Bootstrappable {
                     future.complete(PlayerRank.DEFAULT);
                     setPlayerRank(uuid, PlayerRank.DEFAULT);
                 }
-            } catch (SQLException e) {
-                Logger.error("An error occurred whilst fetching the rank of '" + uuid + "'");
+            } catch (Exception e) {
+                Logger.error("An error occurred whilst fetching the rank of '" + uuid + "'", e);
+                future.completeExceptionally(e);
             }
         });
         return future;
