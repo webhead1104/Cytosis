@@ -1,10 +1,10 @@
 package net.cytonic.cytosis;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import lombok.Getter;
@@ -27,10 +27,10 @@ public class CytosisContext {
     public final String SERVER_ID = generateID();
 
     // map for bootstrappable services
-    private Map<Class<?>, Object> components = new HashMap<>();
+    private Map<Class<?>, Object> components = new ConcurrentHashMap<>();
 
     // consumers that should run when a component becomes available
-    private Map<Class<?>, List<Consumer<?>>> availabilityConsumers = new HashMap<>();
+    private Map<Class<?>, List<Consumer<?>>> availabilityConsumers = new ConcurrentHashMap<>();
 
     // Misc
     private boolean metricsEnabled = false;
@@ -151,7 +151,7 @@ public class CytosisContext {
             return;
         }
         availabilityConsumers
-            .computeIfAbsent(componentClass, _ -> new ArrayList<>())
+            .computeIfAbsent(componentClass, _ -> new CopyOnWriteArrayList<>())
             .add(consumer);
     }
 
