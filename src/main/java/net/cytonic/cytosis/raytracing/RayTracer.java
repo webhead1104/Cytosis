@@ -44,21 +44,21 @@ public class RayTracer {
         boolean ignoreFluids, Entity... exclude) {
         Vec normalizedDirection = direction.normalize();
 
-        RayTraceResult blockResult = rayTraceBlocks(instance, origin, normalizedDirection, range, ignoreFluids);
-        RayTraceResult entityResult = rayTraceEntities(instance, origin, normalizedDirection, range, exclude);
+        RayTraceResult blockResult = traceBlocks(instance, origin, normalizedDirection, range, ignoreFluids);
+        RayTraceResult entityResult = traceEntities(instance, origin, normalizedDirection, range, exclude);
 
         return Optional.ofNullable(getClosestResult(origin, blockResult, entityResult));
     }
 
-    public static Optional<RayTraceResult> rayTraceBlocks(Instance instance, Vec direction, Point origin, double range,
-        boolean ignoreFluids) {
-        return Optional.ofNullable(rayTraceBlocks(instance, origin, direction.normalize(), range, ignoreFluids));
+    public static Optional<RayTraceResult> rayTraceBlocks(Instance instance, Point origin, Vec direction,
+        double range, boolean ignoreFluids) {
+        return Optional.ofNullable(traceBlocks(instance, origin, direction.normalize(), range, ignoreFluids));
     }
 
     /**
      * Ray trace against blocks using DDA algorithm with collision shape support
      */
-    private static RayTraceResult rayTraceBlocks(Instance instance, Point origin, Vec direction, double range,
+    private static RayTraceResult traceBlocks(Instance instance, Point origin, Vec direction, double range,
         boolean ignoreFluids) {
         DdaRayTracer ddaTracer = new DdaRayTracer(origin, direction, range);
         RayTraceResult closestResult = null;
@@ -84,15 +84,15 @@ public class RayTracer {
         return closestResult;
     }
 
-    public static Optional<RayTraceResult> rayTraceEntities(Instance instance, Vec direction, Point origin,
+    public static Optional<RayTraceResult> rayTraceEntities(Instance instance, Point origin, Vec direction,
         double range, Entity... ignore) {
-        return Optional.ofNullable(rayTraceEntities(instance, origin, direction.normalize(), range, ignore));
+        return Optional.ofNullable(traceEntities(instance, origin, direction.normalize(), range, ignore));
     }
 
     /**
      * Ray trace against entities using bounding box intersection
      */
-    private static RayTraceResult rayTraceEntities(Instance instance, Point origin, Vec direction, double range,
+    private static RayTraceResult traceEntities(Instance instance, Point origin, Vec direction, double range,
         Entity... excludeEntities) {
         Set<Entity> entities = instance.getEntities();
         List<Entity> toExclude = Utils.list(excludeEntities);
