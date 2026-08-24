@@ -32,6 +32,7 @@ public class FriendPacketsPublisher {
 
             if (throwable != null) {
                 player.error("An error occurred whilst sending your friend request!");
+                return;
             }
             if (response.success()) {
                 return;
@@ -69,6 +70,7 @@ public class FriendPacketsPublisher {
                     .ifPresent(p -> p.error("Failed to process your friend request!"));
             }
             Logger.error("Internal error upon processing a friend acceptance.", throwable);
+            return;
         }
         if (response.success()) {
             return;
