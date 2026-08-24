@@ -31,7 +31,7 @@ public class ServerStatusNotifyListener {
     @NotifyHandler(subject = "servers.shutdown")
     public static void serverShutdown(ServerStatusNotifyPacket.Packet packet) {
         CytonicServer server = new CytonicServer(packet);
-        Cytosis.get(CytonicNetwork.class).getServers().put(packet.id(), server);
+        Cytosis.get(CytonicNetwork.class).getServers().remove(packet.id());
         Logger.info("Shutdown server: " + packet.id());
 
         Cytosis.getOnlinePlayers().forEach(player -> {
