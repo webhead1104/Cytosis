@@ -93,7 +93,8 @@ public class MuteCommand extends CytosisCommand {
                 }
                 Component snoop = actor.formattedName().append(Msg.grey(" muted "))
                     .append(SnoopUtils.toTarget(uuid))
-                    .append(Msg.grey(" for " + DurationParser.unparseFull(duration) + "."));
+                    .append(duration == null ? Msg.grey(" permanently.")
+                        : Msg.grey(" for " + DurationParser.unparseFull(duration) + "."));
 
                 Cytosis.get(SnooperManager.class).sendSnoop(Snoops.PLAYER_MUTE, Msg.snoop(snoop));
                 Cytosis.get(MetricsManager.class).addToLongCounter(Metrics.PLAYER_MUTES, 1, Attributes.of(
@@ -105,8 +106,12 @@ public class MuteCommand extends CytosisCommand {
                         actor.error("An error occurred whilst muting %s!", target);
                         return;
                     }
-                    actor.sendMessage(Msg.greenSplash("MUTED!", "%s was successfully muted for %s.", target,
-                        DurationParser.unparseFull(duration)));
+                    if (duration == null) {
+                        actor.sendMessage(Msg.greenSplash("MUTED!", "%s was successfully muted permanently.", target));
+                    } else {
+                        actor.sendMessage(Msg.greenSplash("MUTED!", "%s was successfully muted for %s.", target,
+                            DurationParser.unparseFull(duration)));
+                    }
                 });
             });
         });
