@@ -165,7 +165,8 @@ public class EnvironmentDatabase implements Bootstrappable {
 
         CompletableFuture<ResultSet> future = new CompletableFuture<>();
         worker.submit(() -> {
-            try (Connection conn = getConnection()) {
+            try {
+                Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery();
                 future.complete(rs);
@@ -204,7 +205,8 @@ public class EnvironmentDatabase implements Bootstrappable {
      */
     public ResultSet querySync(String sql) {
         checkConditions();
-        try (Connection conn = getConnection()) {
+        try {
+            Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             return ps.executeQuery();
         } catch (SQLException e) {
