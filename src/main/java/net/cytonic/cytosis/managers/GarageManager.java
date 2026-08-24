@@ -64,6 +64,7 @@ public class GarageManager implements Bootstrappable {
                 future.complete(client.getObject(request).readAllBytes());
             } catch (Exception e) {
                 Logger.error("An error occurred while trying to download object from bucket: " + bucket, e);
+                future.completeExceptionally(e);
             }
         });
         return future;
@@ -83,6 +84,7 @@ public class GarageManager implements Bootstrappable {
                 future.complete(null);
             } catch (Exception e) {
                 Logger.error("An error occurred while trying to upload object from bucket: " + bucket, e);
+                future.completeExceptionally(e);
             }
         });
         return future;
