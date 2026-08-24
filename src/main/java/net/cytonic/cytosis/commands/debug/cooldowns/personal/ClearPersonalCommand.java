@@ -35,7 +35,7 @@ public class ClearPersonalCommand extends CytosisCommand {
 
             Key node = Key.key(context.get(nodeArg));
 
-            cooldown.resetGlobalCooldown(node);
+            cooldown.resetPersonalCooldown(player.getUuid(), node);
             player.success("Reset your personal cooldown <yellow>'%s'</yellow>.", node.asString());
         }, nodeArg);
     }
