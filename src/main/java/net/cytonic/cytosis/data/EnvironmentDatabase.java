@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.Delegate;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.minestom.server.MinecraftServer;
@@ -181,15 +182,18 @@ public class EnvironmentDatabase implements Bootstrappable {
      * Queries the database with the specified prepared statement
      *
      * @param preparedStatement the query
-     * @return the result set of the query, completed once the query is complete
+     * @return the result set of the query, completed once the query is complete. Closing the returned result set also
+     *         releases its backing statement and pooled connection.
      */
     public CompletableFuture<ResultSet> query(PreparedStatement preparedStatement) {
         checkConditions();
 
         CompletableFuture<ResultSet> future = new CompletableFuture<>();
         worker.submit(() -> {
-            try (Connection conn = getConnection()) {
-                future.complete(preparedStatement.executeQuery());
+            try {
+                Connection conn = preparedStatement.getConnection();
+                ResultSet rs = preparedStatement.executeQuery();
+                future.complete(new OwnedResultSet(rs, preparedStatement, conn));
             } catch (SQLException e) {
                 future.completeExceptionally(e);
             }
@@ -214,10 +218,18 @@ public class EnvironmentDatabase implements Bootstrappable {
         }
     }
 
+    /**
+     * Queries the database with the specified prepared statement, SYNCHRONOUSLY
+     *
+     * @param ps the query
+     * @return The {@link ResultSet} of the query. Closing it also releases its backing statement and pooled
+     *         connection.
+     */
     public ResultSet querySync(PreparedStatement ps) {
         checkConditions();
         try {
-            return ps.executeQuery();
+            Connection conn = ps.getConnection();
+            return new OwnedResultSet(ps.executeQuery(), ps, conn);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -236,7 +248,7 @@ public class EnvironmentDatabase implements Bootstrappable {
     }
 
     /**
-     * Updates the database with the specified SQL
+     * Updates the database with the specified prepared statement
      *
      * @param sql The SQL update
      * @return A {@link CompletableFuture} for when the update is completed
@@ -246,8 +258,8 @@ public class EnvironmentDatabase implements Bootstrappable {
 
         CompletableFuture<Void> future = new CompletableFuture<>();
         worker.submit(() -> {
-            try {
-                sql.executeUpdate();
+            try (Connection conn = sql.getConnection(); PreparedStatement ps = sql) {
+                ps.executeUpdate();
                 future.complete(null);
             } catch (SQLException e) {
                 Logger.error("An error occurred whilst updating the database!", e);
@@ -277,6 +289,33 @@ public class EnvironmentDatabase implements Bootstrappable {
             }
         });
         return future;
+    }
+
+    /**
+     * A {@link ResultSet} that owns the resources backing it: closing it also closes its statement and the pooled
+     * connection the statement was created from, so handing out a live result set never leaks a pooled connection.
+     */
+    @SuppressWarnings("deprecation")
+    private static final class OwnedResultSet implements ResultSet {
+
+        private final PreparedStatement statement;
+        private final Connection connection;
+        @Delegate(types = ResultSet.class)
+        private final ResultSet resultSet;
+
+        private OwnedResultSet(ResultSet resultSet, PreparedStatement statement, Connection connection) {
+            this.resultSet = resultSet;
+            this.statement = statement;
+            this.connection = connection;
+        }
+
+        @Override
+        public void close() throws SQLException {
+            try (ResultSet rs = this.resultSet; PreparedStatement ps = this.statement;
+                 Connection conn = this.connection) {
+                // resources are closed in reverse declaration order, releasing the pooled connection last
+            }
+        }
     }
 
     private void checkConditions() {
