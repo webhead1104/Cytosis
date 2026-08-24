@@ -374,7 +374,7 @@ public class PartyManager implements Bootstrappable {
             return;
         }
         Party party = parties.get(partyId);
-        party.setMuted(state);
+        party.setOpen(state);
         String verb = state ? "opened the party. Anyone can now join with /party join." : "closed the party.";
 
         for (UUID p : party.getAllPlayers()) {
