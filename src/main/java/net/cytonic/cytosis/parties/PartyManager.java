@@ -396,7 +396,7 @@ public class PartyManager implements Bootstrappable {
             return;
         }
         Party party = parties.get(partyId);
-        party.setMuted(state);
+        party.setOpenInvites(state);
         String verb =
             state ? "opened the party's invites. Anyone can now send invites." : "closed the party's invites.";
 
