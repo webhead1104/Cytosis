@@ -48,7 +48,7 @@ public record IgnoredChatChannelContainer(
             case MOD -> withMod(val);
             case PARTY -> withParty(val);
             case STAFF -> withStaff(val);
-            default -> NONE;
+            default -> this;
         };
     }
 }
