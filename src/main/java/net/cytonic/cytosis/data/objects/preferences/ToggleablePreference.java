@@ -27,7 +27,11 @@ public class ToggleablePreference extends Preference<Boolean> {
 
     @Override
     public StoredPreference toStorage() {
-        return new StoredPreference(getKey(), getValue().toString());
+        Boolean value = getValue();
+        if (value == null) {
+            return new StoredPreference(getKey(), "null");
+        }
+        return new StoredPreference(getKey(), value.toString());
     }
 
     @Override
