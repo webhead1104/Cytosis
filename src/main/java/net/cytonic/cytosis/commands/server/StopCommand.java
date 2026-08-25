@@ -27,6 +27,7 @@ public class StopCommand extends CytosisCommand {
         });
 
         ArgumentInteger secondsArg = ArgumentType.Integer("seconds");
+        secondsArg.between(1, Integer.MAX_VALUE);
         addSyntax((s, ctx) -> {
             if (!(s instanceof CytosisPlayer player)) return;
             int seconds = ctx.get(secondsArg);
@@ -42,6 +43,7 @@ public class StopCommand extends CytosisCommand {
                 .start();
         } catch (IOException e) {
             player.error("An error occurred! %s", e.getMessage());
+            return;
         }
         player.success("Dispatched the shutdown of this server!");
     }
