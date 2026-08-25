@@ -35,7 +35,7 @@ import net.cytonic.cytosis.utils.Utils;
     name = "cytonic_chat",
     indexes = {
         @Index(name = "idx_sender", columnList = "sender"),
-        @Index(name = "idx_recipient", columnList = "sender"),
+        @Index(name = "idx_recipient", columnList = "recipient"),
         @Index(name = "idx_sent_at", columnList = "sent_at")
     }
 )
