@@ -61,14 +61,16 @@ public final class UuidUtils {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             if (con.getResponseCode() == 200) {
-                InputStreamReader reader = new InputStreamReader(con.getInputStream());
-                JsonObject obj = JsonParser.parseReader(reader).getAsJsonObject();
-                con.disconnect();
-                return obj.get("id").getAsString();
+                try (InputStreamReader reader = new InputStreamReader(con.getInputStream())) {
+                    JsonObject obj = JsonParser.parseReader(reader).getAsJsonObject();
+                    return obj.get("id").getAsString();
+                } finally {
+                    con.disconnect();
+                }
             }
             con.disconnect();
         } catch (IOException e) {
-            Logger.error("An error occoured whilst fetching " + username + "'s UUID from Mojang's API.");
+            Logger.error("An error occoured whilst fetching " + username + "'s UUID from Mojang's API.", e);
         }
         return null;
     }
