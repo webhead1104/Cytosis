@@ -43,11 +43,11 @@ public class GetGlobalCommand extends CytosisCommand {
             if (cooldown.isOnGlobalCooldown(node)) {
                 Instant expires = cooldown.getGlobalExpiry(node);
                 player.sendMessage(Msg.yellowSplash("TICK TOCK!",
-                    "The global cooldown <yellow>'%s'/yellow> is set to expire in %s.", node.asString(),
+                    "The global cooldown <yellow>'%s'</yellow> is set to expire in %s.", node.asString(),
                     DurationParser.unparseFull(expires)));
                 return;
             }
-            player.whoops("The global cooldown <yellow>'%s'/yellow> isn't active!", node.asString());
+            player.whoops("The global cooldown <yellow>'%s'</yellow> isn't active!", node.asString());
         }, nodeArg);
     }
 }
