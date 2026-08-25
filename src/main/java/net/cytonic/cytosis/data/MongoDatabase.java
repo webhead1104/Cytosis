@@ -50,6 +50,11 @@ public class MongoDatabase implements Bootstrappable {
         Logger.info("MongoDB Client successfully connected!");
     }
 
+    @Override
+    public void shutdown() {
+        client.close();
+    }
+
     @Blocking
     @Nullable
     public <T> T getDocument(String documentId, String collection, String database, Codec<T> codec) {
