@@ -34,8 +34,7 @@ public class ChatMessageNotifyListener implements NotifyListener<Packet> {
             recipients = Cytosis.getOnlinePlayers().stream().map(CytosisPlayer::getUuid).collect(Collectors.toSet());
         }
 
-        assert recipients != null;
-        if (recipients.isEmpty()) return;
+        if (recipients == null || recipients.isEmpty()) return;
 
         Sound sound = Sound.sound(SoundEvent.ENTITY_EXPERIENCE_ORB_PICKUP, Sound.Source.PLAYER, .7f, 1.0F);
         recipients.forEach(uuid -> Cytosis.getPlayer(uuid).ifPresent(player -> {
