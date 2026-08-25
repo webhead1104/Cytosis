@@ -35,6 +35,7 @@ public class LineEffect extends StaticEffect {
             double t = i * increment;
             positions.add(pos1.add(normalized.mul(t)));
         }
+        positions.add(pos2);
         return positions;
     }
 
