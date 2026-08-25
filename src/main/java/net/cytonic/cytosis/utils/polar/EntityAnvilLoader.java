@@ -70,6 +70,10 @@ public class EntityAnvilLoader extends AnvilLoader {
                     if (entityType == EntityType.PAINTING) {
                         pos = parseBlockPos(binaryTag.getIntArray("block_pos"), binaryTag.getList("Rotation"));
                         StringBinaryTag variantTag = (StringBinaryTag) binaryTag.get("variant");
+                        if (variantTag == null) {
+                            Logger.warn("Missing painting variant value - skipping entity");
+                            return;
+                        }
                         RegistryKey<PaintingVariant> ref = MinecraftServer.getPaintingVariantRegistry()
                             .getKey(Key.key(variantTag.value()));
                         if (ref == null) {
@@ -79,6 +83,10 @@ public class EntityAnvilLoader extends AnvilLoader {
                         entity.set(DataComponents.PAINTING_VARIANT, ref);
 
                         ByteBinaryTag facingTag = (ByteBinaryTag) binaryTag.get("facing");
+                        if (facingTag == null) {
+                            Logger.warn("Missing painting facing value - skipping entity");
+                            return;
+                        }
                         Direction dir;
                         byte facing = facingTag.value();
                         if (facing == 0) {
@@ -99,6 +107,10 @@ public class EntityAnvilLoader extends AnvilLoader {
                     } else if (entityType == EntityType.ITEM_FRAME || entityType == EntityType.GLOW_ITEM_FRAME) {
                         pos = parseBlockPos(binaryTag.getIntArray("block_pos"), binaryTag.getList("Rotation"));
                         ByteBinaryTag facingTag = (ByteBinaryTag) binaryTag.get("Facing");
+                        if (facingTag == null) {
+                            Logger.warn("Missing item frame facing value - skipping entity");
+                            return;
+                        }
                         Direction dir;
                         byte facing = facingTag.value();
                         if (facing == 0) {
