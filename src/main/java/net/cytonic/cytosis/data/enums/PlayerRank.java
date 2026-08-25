@@ -66,7 +66,17 @@ public enum PlayerRank {
     }
 
     /**
-     * A method to check if a rank can be changed
+     * A method to check if a rank can be changed.
+     *
+     * <p>The enforced rule matrix is:</p>
+     * <ul>
+     *     <li>An {@link #OWNER} may make any change.</li>
+     *     <li>A no-op (the original and new roles are identical) is never allowed.</li>
+     *     <li>A demotion requires the changer's role to be at or above the target's original role; the granted
+     *     role is necessarily below both, so no further check is needed.</li>
+     *     <li>A promotion requires the changer's role to be at or above the target's original role AND the
+     *     granted role must not be strictly above the changer's own role.</li>
+     * </ul>
      *
      * @param currentUserRole    The changer's current role
      * @param targetOriginalRole The player's original role
@@ -82,7 +92,10 @@ public enum PlayerRank {
             return currentUserRole.ordinal() <= targetOriginalRole.ordinal();
         }
         if (isPromotion(targetOriginalRole, targetNewRole)) {
-            return currentUserRole.ordinal() <= targetOriginalRole.ordinal();
+            // The actor must outrank the target's original role, and must never grant a role strictly above
+            // their own rank.
+            return currentUserRole.ordinal() <= targetOriginalRole.ordinal()
+                && targetNewRole.ordinal() >= currentUserRole.ordinal();
         }
         // If it's neither promotion nor demotion, it's an invalid operation
         return false;
