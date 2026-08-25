@@ -56,10 +56,7 @@ public class BezierCurveEffect extends KeyframedEffect {
         BridgingStrategy bridge) {
         List<Pos> points = sampleArc(resolution, precision, ctrl);
         List<Keyframe<?>> keyframes = new ArrayList<>();
-        for (int i = 0; i < points.size(); i++) {
-            if (i == 0 || i == points.size() - 1) {
-                continue; // don't compute bridge
-            }
+        for (int i = 1; i < points.size(); i++) {
             keyframes.add(new Keyframe<>(bridge.render(supplier, points.get(i - 1), points.get(i))));
         }
         return keyframes;
