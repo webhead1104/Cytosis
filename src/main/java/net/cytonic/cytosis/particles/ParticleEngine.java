@@ -104,4 +104,12 @@ public class ParticleEngine {
         }
         SCHEDULER.schedule(() -> effect.play(audience), delay, TimeUnit.MILLISECONDS);
     }
+
+    /**
+     * Shuts down this engine's scheduler. Must be called when the owning instance is discarded, otherwise its
+     * scheduler thread leaks for the remaining life of the JVM.
+     */
+    public void shutdown() {
+        SCHEDULER.shutdownNow();
+    }
 }
