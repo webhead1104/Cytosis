@@ -3,6 +3,7 @@ package net.cytonic.cytosis.managers;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -167,7 +168,7 @@ public class ChatManager implements Bootstrappable {
     }
 
     public boolean hasOpenPrivateChannel(CytosisPlayer player, UUID uuid) {
-        return openPrivateChannels.getIfPresent(player.getUuid()) == uuid;
+        return Objects.equals(openPrivateChannels.getIfPresent(player.getUuid()), uuid);
     }
 
     public boolean hasOpenPrivateChannel(CytosisPlayer player) {
