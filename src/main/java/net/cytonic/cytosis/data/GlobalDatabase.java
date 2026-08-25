@@ -300,12 +300,12 @@ public class GlobalDatabase implements Bootstrappable {
                 throw new IllegalStateException("The database must be connected to mute players.");
             }
             try (Connection conn = getConnection()) {
-                Cytosis.get(CytonicNetwork.class).getMutedPlayers().put(uuid, true);
                 PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO cytonic_mutes (uuid, to_expire) VALUES (?,?) ON CONFLICT (uuid) DO NOTHING");
                 ps.setObject(1, uuid);
                 ps.setString(2, toExpire.toString());
                 ps.executeUpdate();
+                Cytosis.get(CytonicNetwork.class).getMutedPlayers().put(uuid, true);
                 future.complete(null);
             } catch (SQLException e) {
                 Logger.error("An error occurred whilst muting the player " + uuid + ".", e);
@@ -363,10 +363,10 @@ public class GlobalDatabase implements Bootstrappable {
         CompletableFuture<Void> future = new CompletableFuture<>();
         worker.submit(() -> {
             try (Connection conn = getConnection()) {
-                Cytosis.get(CytonicNetwork.class).getMutedPlayers().remove(uuid);
                 PreparedStatement ps = conn.prepareStatement("DELETE FROM cytonic_mutes WHERE uuid = ?");
                 ps.setObject(1, uuid);
                 ps.executeUpdate();
+                Cytosis.get(CytonicNetwork.class).getMutedPlayers().remove(uuid);
                 future.complete(null);
             } catch (SQLException e) {
                 Logger.error("An error occurred whilst unmuting the player " + uuid + ".", e);
