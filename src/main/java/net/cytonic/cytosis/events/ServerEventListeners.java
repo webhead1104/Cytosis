@@ -105,12 +105,9 @@ public final class ServerEventListeners {
     @Listener
     @Priority(100)
     private void onBlockPlace(PlayerBlockPlaceEvent event) {
-        if (event.getPlayer() instanceof CytosisPlayer player) {
-            //todo: add a preference to disable block updates
-            event.setDoBlockUpdates(true);
-        } else {
-            throw new IllegalStateException("Invalid player object");
-        }
+        if (!(event.getPlayer() instanceof CytosisPlayer)) return;
+        //todo: add a preference to disable block updates
+        event.setDoBlockUpdates(true);
     }
 
     @Listener
