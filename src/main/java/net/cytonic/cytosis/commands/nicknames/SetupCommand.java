@@ -212,7 +212,7 @@ public class SetupCommand extends CytosisCommand {
         return switch (rank) {
             case CORTEX -> "<dark_purple>[CORTEX]";
             case SYNAPSE -> "<dark_green>[SYNAPSE]";
-            case NEXUS -> "<gold>[NEUX]";
+            case NEXUS -> "<gold>[NEXUS]";
             default -> "<gray>DEFAULT";
         };
     }
