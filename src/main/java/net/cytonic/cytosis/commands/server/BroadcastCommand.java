@@ -29,14 +29,14 @@ public class BroadcastCommand extends CytosisCommand {
         });
         setDefaultExecutor((sender, _) -> sender.sendMessage(Msg.whoops("Usage: /broadcast (message)")));
         addSyntax((_, context) -> {
-            if (!Cytosis.getOnlinePlayers().isEmpty()) {
-                Component broadcast = Msg.aquaSplash("Broadcast",
-                    "» <white>" + String.join(" ", context.get(broadcastArgument)));
-                if (context.get(serverArgument).equalsIgnoreCase("this")) {
+            Component broadcast = Msg.aquaSplash("Broadcast",
+                "» <white>" + String.join(" ", context.get(broadcastArgument)));
+            if (context.get(serverArgument).equalsIgnoreCase("this")) {
+                if (!Cytosis.getOnlinePlayers().isEmpty()) {
                     Cytosis.getOnlinePlayers().forEach(player -> player.sendMessage(broadcast));
-                } else if (context.get(serverArgument).equalsIgnoreCase("all")) {
-                    new BroadcastNotifyPacket.Packet(broadcast).publish();
                 }
+            } else if (context.get(serverArgument).equalsIgnoreCase("all")) {
+                new BroadcastNotifyPacket.Packet(broadcast).publish();
             }
         }, serverArgument, broadcastArgument);
     }
