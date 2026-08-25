@@ -94,12 +94,13 @@ public interface Logger {
 
     private static void emitSnoop(String msg) {
         if (!Cytosis.CONTEXT.isSendErrorsThroughSnooper()) return;
-        Component component = Msg.redSplash("Error on server " + Cytosis.CONTEXT.SERVER_ID, "<newline> %s", msg);
-        try {
-            Cytosis.get(SnooperManager.class).sendSnoop(Snoops.SERVER_ERROR, Msg.snoop(component));
-        } catch (NullPointerException ignored) { // Snooper isn't initialized Yet
+        SnooperManager snooperManager = Cytosis.get(SnooperManager.class);
+        if (snooperManager == null) { // Snooper isn't initialized yet
             Logger.warn("Failed to log error via snooper!");
+            return;
         }
+        Component component = Msg.redSplash("Error on server " + Cytosis.CONTEXT.SERVER_ID, "<newline> %s", msg);
+        snooperManager.sendSnoop(Snoops.SERVER_ERROR, Msg.snoop(component));
     }
 
     private static void emit(Severity severity, String msg, @Nullable Attributes attribs) {
