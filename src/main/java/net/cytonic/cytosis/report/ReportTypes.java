@@ -135,7 +135,7 @@ interface ReportTypes {
                 String miniContext = "";
                 int counter = 0;
                 for (ChatMessage message : messages) {
-                    if (counter > 10) break;
+                    if (counter >= 10) break;
                     counter++;
                     miniContext += "\n  > " + message.getContent();
                 }
