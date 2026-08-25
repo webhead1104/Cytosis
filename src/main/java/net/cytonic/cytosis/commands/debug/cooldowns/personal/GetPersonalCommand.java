@@ -42,11 +42,11 @@ public class GetPersonalCommand extends CytosisCommand {
             if (ncm.isOnPersonalCooldown(player.getUuid(), node)) {
                 Instant expires = ncm.getPersonalExpiry(player.getUuid(), node);
                 player.sendMessage(Msg.yellowSplash("TICK TOCK!",
-                    "Your personal cooldown <yellow>'%s'/yellow> is set to expire in %s.", node.asString(),
+                    "Your personal cooldown <yellow>'%s'</yellow> is set to expire in %s.", node.asString(),
                     DurationParser.unparseFull(expires)));
                 return;
             }
-            player.whoops("Your personal cooldown <yellow>'%s'/yellow> isn't active!", node.asString());
+            player.whoops("Your personal cooldown <yellow>'%s'</yellow> isn't active!", node.asString());
         }, nodeArg);
     }
 }
