@@ -35,7 +35,6 @@ public class SnoopPersistenceManager {
         return CompletableFuture.supplyAsync(() -> {
             QQueriedSnoop queriedSnoop = new QQueriedSnoop()
                 .target.eq(target)
-                .target.ne((byte) 0)
                 .setMaxRows(1000)
                 .channel.eq(channel)
                 .content.icontains(search);
