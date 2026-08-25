@@ -145,6 +145,9 @@ public class CommandDisablingManager implements Bootstrappable {
             }
 
             return null;
+        }).exceptionally(throwable -> {
+            Logger.error("Failed to load globally-disabled commands!", throwable);
+            return null;
         });
     }
 
