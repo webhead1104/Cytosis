@@ -117,7 +117,7 @@ final class AccessibleRegionFile implements AutoCloseable {
 
             // Read the raw content
             byte[] data = new byte[length - 1];
-            file.read(data);
+            file.readFully(data);
 
             // Parse it as a compound tag
             return TAG_READER.read(new ByteArrayInputStream(data), compression);
