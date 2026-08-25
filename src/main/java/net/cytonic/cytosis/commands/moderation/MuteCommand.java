@@ -52,6 +52,7 @@ public class MuteCommand extends CytosisCommand {
             if (sender instanceof CytosisPlayer actor) {
                 if (!actor.isModerator()) {
                     actor.sendMessage(Msg.red("You don't have permission to use this command!"));
+                    return;
                 }
 
                 final String target = context.get(playerArg);
