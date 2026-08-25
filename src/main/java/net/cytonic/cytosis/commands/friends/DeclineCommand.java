@@ -32,7 +32,7 @@ class DeclineCommand extends CytosisCommand {
             }
 
             if (targetObj.uuid().equals(player.getUuid())) {
-                player.whoops("You cannot accept your own friend request!");
+                player.whoops("You cannot decline your own friend request!");
                 return;
             }
 
