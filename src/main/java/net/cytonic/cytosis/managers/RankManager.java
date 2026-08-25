@@ -56,11 +56,11 @@ public class RankManager implements Bootstrappable {
 
     @Blocking
     public void loadPlayerNow(UUID uuid) {
-        PlayerRank rank = PlayerRank.DEFAULT;
         String cachedRank = redis.getFromGlobalHash("player_ranks", uuid.toString());
         if (cachedRank != null) {
-            rank = PlayerRank.valueOf(cachedRank);
+            rankMap.put(uuid, PlayerRank.valueOf(cachedRank));
         } else {
+            rankMap.put(uuid, PlayerRank.DEFAULT);
             // we need to load it for next time!
             gdb.getPlayerRank(uuid).thenAccept(playerRank -> {
                 rankMap.put(uuid, playerRank);
@@ -69,7 +69,6 @@ public class RankManager implements Bootstrappable {
                     .addToGlobalHash("player_ranks", uuid.toString(), playerRank.name());
             });
         }
-        rankMap.put(uuid, rank);
     }
 
     /**
