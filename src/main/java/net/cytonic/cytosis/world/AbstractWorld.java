@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.instance.InstanceUnregisterEvent;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.registry.RegistryKey;
 import net.minestom.server.world.DimensionType;
@@ -21,6 +22,7 @@ public abstract class AbstractWorld extends InstanceContainer {
         // make particle engine accessible via a tag or method
         this.particleEngine = new ParticleEngine(this);
         setTag(ParticleEngine.TAG, particleEngine);
+        eventNode().addListener(InstanceUnregisterEvent.class, event -> particleEngine.shutdown());
 
         MinecraftServer.getInstanceManager().registerInstance(this);
     }
