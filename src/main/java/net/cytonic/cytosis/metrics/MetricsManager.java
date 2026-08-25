@@ -138,9 +138,9 @@ public class MetricsManager implements Bootstrappable {
     public void addToLongCounter(String counterName, long value, Attributes extraAttributes) {
         if (!Cytosis.CONTEXT.isMetricsEnabled()) return;
         validateState(counterName);
-        if (value <= 0) {
+        if (value < 0) {
             Logger.warn("A negative value cannot be added to a counter. Skipping.");
-            return; // no negative values, adding 0 does nothing
+            return;
         }
         if (!longsCounters.containsKey(counterName)) {
             Logger.warn("Attempted to add a value to an unknown counter: " + counterName);
@@ -165,8 +165,8 @@ public class MetricsManager implements Bootstrappable {
     public void addToDoubleCounter(String counterName, double value, Attributes extraAttributes) {
         if (!Cytosis.CONTEXT.isMetricsEnabled()) return;
         validateState(counterName);
-        if (value <= 0) {
-            return; // no negative values
+        if (value < 0) {
+            return;
         }
         if (!doublesCounters.containsKey(counterName)) return;
         doublesCounters.get(counterName).add(value, baseAttribs.toBuilder().putAll(extraAttributes).build());
